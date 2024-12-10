@@ -1,0 +1,16 @@
+{
+  "name": "nodejs-hello-world",
+  "version": "1.0.0",
+  "description": "- Init the project",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "typescript": "^5.7.2"
+  }
+}
