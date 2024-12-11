@@ -4,7 +4,7 @@ export function sendMail(data: string): Promise<{
   data: string;
 }> {
   return new Promise((resolve, reject) => {
-    const isSuccess = Math.random() < 0.1;
+    const isSuccess = Math.random() < 0.9;
     setTimeout(() => {
       if (isSuccess) {
         resolve({
