@@ -16,6 +16,8 @@ async function runAsyncFileOperation() {
     }
   } catch (error) {
     console.log("error", error);
+    // sending mail failed
+    await sendMail("File write vayena");
   }
 }
 

@@ -20,7 +20,9 @@ export function asyncWriteFilePromise(
   data: string
 ): Promise<{ message: string; isSuccess: boolean }> {
   return new Promise((resolve, reject) => {
-    writeFile(name, data, (err) => {
+    const cwd = process.cwd();
+    console.log("__dirname", __dirname);
+    writeFile(`${cwd}/dist/_generated_files/${name}`, data, (err) => {
       if (err) {
         console.error("Error", err);
         reject({
