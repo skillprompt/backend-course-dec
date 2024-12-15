@@ -1,6 +1,12 @@
 import http from "http";
 
-console.log("backend...");
+type TTodo = { id: number; name: string };
+let todos: TTodo[] = [
+  {
+    id: 1,
+    name: "learn css",
+  },
+];
 
 const server = http.createServer(async (req, res) => {
   const url = req.url;
@@ -20,6 +26,13 @@ const server = http.createServer(async (req, res) => {
   // 4 start => client error
   // 5 start => server error
 
+  // Todo App
+  // POST /todos : create a todo
+  // PUT /todos/:todoId: update a todo by id
+  // DELETE /todos/:todoId: delete a todo by id
+  // GET /todos : get all todos
+  // GET /todos/:todoId: get a todo by id
+
   if (req.url === "/") {
     // homepage data return
     res.write("Hello from home page");
@@ -27,8 +40,8 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  if (req.url === "/create-todo" && req.method === "POST") {
-    // create-todo data returned
+  // update todo api
+  if (req.url === "/todos" && req.method === "POST") {
     let dataString = "";
 
     await new Promise((resolve, reject) => {
@@ -47,26 +60,94 @@ const server = http.createServer(async (req, res) => {
       });
     });
 
-    console.log("dataString", dataString);
+    const dataParsed = JSON.parse(dataString);
 
-    res.write(`<p style="color: red;">Todo created: ${dataString}</p>`);
+    todos.push({
+      id: todos.length + 1,
+      name: dataParsed.name,
+    });
+
+    res.write("Todo Created Successfully");
     res.end();
     return;
   }
 
-  if (req.url === "/services") {
-    // routing
+  if (req.url?.includes("/todos/")) {
+    const todoId = req.url.split("/").pop();
+    if (!todoId) {
+      res.setHeader("Todo id not sent", 400);
+      res.end();
+      return;
+    }
+    let dataString = "";
+
+    if (req.method === "PUT") {
+      // update a todo api
+      await new Promise((resolve, reject) => {
+        req.on("data", (chunk) => {
+          dataString += chunk.toString();
+        });
+
+        req.on("end", () => {
+          console.log("all data has been received...");
+          resolve(dataString);
+        });
+      });
+
+      const parsedData = JSON.parse(dataString);
+
+      const updatedTodos = todos.map((todo) => {
+        if (todo.id === +todoId) {
+          return {
+            ...todo,
+            name: parsedData.name,
+          };
+        }
+        return todo;
+      });
+      todos = updatedTodos;
+
+      res.write("Todo Updated Successfully");
+      res.end();
+      return;
+    }
+
+    if (req.method === "DELETE") {
+      // delete a todo api
+      const todosAfterDeletion = todos.filter((todo) => {
+        if (todo.id === +todoId) {
+          return false;
+        }
+        return true;
+      });
+      todos = todosAfterDeletion;
+      res.write("Todo Deleted Successfully");
+      res.end();
+      return;
+    }
+
+    if (req.method === "GET") {
+      // get a todo by id api
+      const todo = todos.find((todo) => todo.id === +todoId);
+
+      if (!todo) {
+        res.write("TODO not found");
+        res.end();
+        return;
+      }
+
+      res.write(JSON.stringify(todo));
+      res.end();
+      return;
+    }
   }
 
-  if (req.url === "/contact-us") {
-  }
-
-  if (req.url?.includes(`/users/`)) {
-    const userId = req.url.split("/").pop();
-    res.write(`<p style="color: red;">Hello user ${userId}</p>`);
+  if (req.url === "/todos" && req.method === "GET") {
+    res.write(JSON.stringify(todos));
     res.end();
     return;
   }
+
   // not found
   res.write("NOT_FOUND");
   res.end();
@@ -78,6 +159,3 @@ const server = http.createServer(async (req, res) => {
 server.listen(4000, () => {
   console.log("Server started on http://localhost:4000");
 });
-
-//  [1, 2, 3,4, 5,6, 6 ....... 100000];
-// [[1,2,3,4,5], [6, 7,8,9,10], .... [99996, 99997, ...100000]]
