@@ -40,7 +40,7 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // update todo api
+  // create todo api
   if (req.url === "/todos" && req.method === "POST") {
     let dataString = "";
 
@@ -61,7 +61,6 @@ const server = http.createServer(async (req, res) => {
     });
 
     const dataParsed = JSON.parse(dataString);
-
     todos.push({
       id: todos.length + 1,
       name: dataParsed.name,
@@ -79,6 +78,7 @@ const server = http.createServer(async (req, res) => {
       res.end();
       return;
     }
+
     let dataString = "";
 
     if (req.method === "PUT") {
